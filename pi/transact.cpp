@@ -11,8 +11,6 @@
 #define ARM 1
 #define SPEED 1000000
 
-// TODO: Ubiquity API
-
 using namespace std;
 unsigned char buf[BUFSIZE];
 
@@ -25,7 +23,7 @@ int spiSetup(int spiChannel) {
     return fd;
 }
 
-int getData(int spiChannel, unsigned char *data, int size) {
+int getData(int spiChannel, unsigned char *data, int size) {    
     int d;
     if ((d = wiringPiSPIDataRW (spiChannel, data, size)) < 0) {
         cerr << "SPI failure on channel : " << spiChannel << endl;
@@ -81,26 +79,16 @@ int read(int fd, unsigned char *controls) {
 
     if (FD_ISSET(fd, &stReadFDS)) {
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
-        // cout<<recvlen<<endl;
         if(recvlen<0)
             cout<<"ERROR"<<endl;
         else
         {
-            cout<<buf<<endl;
-            // recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
             for (i = 0; buf[i]!='>'; i++) {
-                // cout << buf[i];
                 mid = (buf[i] == ',') ? i : mid;
             }
-            // cout << endl;
             controls[0] = parse(buf, 1, mid);
             controls[1] = parse(buf, mid+1, i);
         }
-      recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
-      for (i = 0; buf[i]!='>'; i++) {
-         // cout << buf[i];
-         mid = (buf[i] == ',') ? i : mid;
-      }
     }
     else
     {
@@ -108,22 +96,23 @@ int read(int fd, unsigned char *controls) {
         controls[0] = (char)0;
         controls[1] = (char)0;
     }
+
     return recvlen;
 }
 
 int main() {
     unsigned char controls[2];
-    int bytes;
+    int bytes[] ={0};
     int sock = setupServer(PORT);
     int driveFD = spiSetup(DRIVE);
-   // int armFD = spiSetup(ARM);
+    int armFD = spiSetup(ARM);
     while (1) {
         read(sock, controls);
-	      read(sock, controls);
-        bytes = getData(DRIVE, &controls[1], 1);
-        cout<<bytes<<" "<<controls[1]<<endl;
-        // bytes = getData(ARM, &controls[1], 1);
+        bytes[0] = getData(DRIVE, &controls[0], 1);
+        bytes[1] = getData(ARM, &controls[1], 1);
+        //cout<<bytes[0]<<" "<<(int)controls[1]<<bytes[1]<<(int)controls[1]<<endl;
         // cout << "drive = " << controls[0] << " arm = " << controls[1] << " bytes = " << bytes << endl;
     }
     return 0;
 }
+
