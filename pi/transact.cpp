@@ -96,10 +96,11 @@ int read(int fd, unsigned char *controls) {
             controls[0] = parse(buf, 1, mid);
             controls[1] = parse(buf, mid+1, i);
         }
-    recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
-    for (i = 0; buf[i]!='>'; i++) {
-        // cout << buf[i];
-        mid = (buf[i] == ',') ? i : mid;
+      recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
+      for (i = 0; buf[i]!='>'; i++) {
+         // cout << buf[i];
+         mid = (buf[i] == ',') ? i : mid;
+      }
     }
     else
     {
@@ -107,7 +108,6 @@ int read(int fd, unsigned char *controls) {
         controls[0] = (char)0;
         controls[1] = (char)0;
     }
-
     return recvlen;
 }
 
@@ -120,8 +120,8 @@ int main() {
     while (1) {
         read(sock, controls);
 	      read(sock, controls);
-        bytes = getData(DRIVE, &controls[0], 1);
-        cout<<bytes<<" "<<controls[0]<<endl;
+        bytes = getData(DRIVE, &controls[1], 1);
+        cout<<bytes<<" "<<controls[1]<<endl;
         // bytes = getData(ARM, &controls[1], 1);
         // cout << "drive = " << controls[0] << " arm = " << controls[1] << " bytes = " << bytes << endl;
     }

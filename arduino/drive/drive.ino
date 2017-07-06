@@ -132,11 +132,8 @@ void Right(int t) {
   Serial.print(x);
   Serial.print(" ");
   Serial.println(t);
-<<<<<<< HEAD
   command(x-1);
-=======
   command(x);
->>>>>>> 9e6435fe030bb1f25e199ba931616aa409b8170c
 }
 
 void act(int arr[], boolean A, boolean B, int pwm) {
