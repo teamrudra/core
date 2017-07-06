@@ -50,7 +50,6 @@ int setupServer(int port) {
     return sock;
 }
 
-
 unsigned char parse(unsigned char n[], int start, int end) {
     int a = 0;
     for (int i = start; i<end; i++) {
@@ -76,7 +75,7 @@ int read(int fd, unsigned char *controls) {
     if (select(fd+1, &stReadFDS, NULL, NULL, &stTimeOut) <0) {
         // cout<<stderr<<"Call to select() failed";
         // exit(1);
-    }    
+    }
 
 
     if (FD_ISSET(fd, &stReadFDS)) {
