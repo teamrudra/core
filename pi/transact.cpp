@@ -104,11 +104,11 @@ int main() {
     unsigned char controls[2];
     int bytes[] ={0};
     int sock = setupServer(PORT);
-    int driveFD = spiSetup(DRIVE);
+    //int driveFD = spiSetup(DRIVE);
     int armFD = spiSetup(ARM);
     while (1) {
         read(sock, controls);
-        bytes[0] = getData(DRIVE, &controls[0], 1);
+       // bytes[0] = getData(DRIVE, &controls[0], 1);
         bytes[1] = getData(ARM, &controls[1], 1);
         //cout<<bytes[0]<<" "<<(int)controls[1]<<bytes[1]<<(int)controls[1]<<endl;
         // cout << "drive = " << controls[0] << " arm = " << controls[1] << " bytes = " << bytes << endl;
