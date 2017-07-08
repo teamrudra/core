@@ -1,5 +1,5 @@
-#ifndef UDP_H
-#define UDP_H
+#ifndef __UDP_H__
+#define __UDP_H__
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <cstring>
