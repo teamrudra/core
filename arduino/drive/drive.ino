@@ -22,7 +22,7 @@ int ss = 53;
 
 int speed = 0;        //speed variable
 int filter = 0.1;      //fileter variable
-int limit = 100;
+int limit = 80;
 int accelUp = 15;    // acceleration variable
 int accelDown = 12;
 //Filter
@@ -75,12 +75,14 @@ void updateBits(int val) {
 void process(int input) {
   if (input) {
     updateBits(input);
+    Serial.println(speed);
     speed += accelUp;    // sq function
     speed = (speed > limit) ? limit : speed;
     Serial.println(speed);
     drive(speed, pwm);
   } else {
     while (speed > 0) {
+      Serial.println(speed);
       speed = (speed < accelDown) ? 0 : speed-accelDown;
       drive(speed, 0);
     }
@@ -116,7 +118,7 @@ void algo(int a, int b, int spd) {
 }
 
 void Left(int t) {
-  int x = map(t, -limit, limit, 26, 102); // forward
+  int x = map(t, -100, 100, 1, 127); // forward
   Serial.print("Left:");
   Serial.print(x);
   Serial.print(" ");
@@ -125,12 +127,12 @@ void Left(int t) {
 }
 
 void Right(int t) {
-  int x = map(t, -limit, limit, 152, 232); // backward
+  int x = map(t, -100, 100, 129, 256); // backward
   Serial.print(" Right:");
   Serial.print(x);
   Serial.print(" ");
   Serial.println(t);
-  command(x);
+  command(x-1);
 }
 
 void act(int arr[], boolean A, boolean B, int pwm) {
@@ -145,6 +147,6 @@ void command(int x) {                  //  High  Low  Latest
   Serial2.write(x);                    //R 40.2  11.2  40.2   
   delay(5);                            //L 69.1  2.6   68.6  
   Serial3.write(x);                    //R 79.5  28.9  79.5   
-  delay(5);                            //L 80    64.2  65.8           
+  delay(5);                            //L 80    64.2  65.8  
 }
 
