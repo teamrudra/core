@@ -74,7 +74,7 @@ void updateBits(int val) {
 
 void process(int input) {
   if (input) {
-    updateBits(data);
+    updateBits(input);
     speed += accelUp;    // sq function
     speed = (speed > limit) ? limit : speed;
     Serial.println(speed);
@@ -96,7 +96,7 @@ void drive(int spd, int pwm) {
   act(LA1, abs(bits[0] - bits[3]), bits[0], pwm);               //  I  Cntrl    (Cntrl - I) Cntrl
   act(LA2, abs(bits[0] - bits[2]), bits[0], pwm);               //  0    1         1         1       //stop
   act(CAM, abs(bits[0] - bits[1]), bits[0], pwm);               //  1    0         abs(-1)   0
-}                                                            //  1    1          0        1
+}                                                               //  1    1          0        1
 
 void display() {
   for (int i = 0; i < 8; i++) {
@@ -139,12 +139,12 @@ void act(int arr[], boolean A, boolean B, int pwm) {
   analogWrite(arr[2], pwm);
 }
 
-void command(int x) {
-  Serial1.write(x);
-  delay(5);
-  Serial2.write(x);
-  delay(5);
-  Serial3.write(x);
-  delay(5);
+void command(int x) {                  //  High  Low  Latest 
+  Serial1.write(x);                    //R 114   51    77.6 
+  delay(5);                            //L 55.4  27.6  52.9 
+  Serial2.write(x);                    //R 40.2  11.2  40.2   
+  delay(5);                            //L 69.1  2.6   68.6  
+  Serial3.write(x);                    //R 79.5  28.9  79.5   
+  delay(5);                            //L 80    64.2  65.8           
 }
 

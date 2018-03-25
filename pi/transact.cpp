@@ -59,7 +59,7 @@ unsigned char parse(unsigned char n[], int start, int end) {
 int read(int fd, unsigned char *controls) {
     int recvlen, mid = 0, i = 0;
     static struct sockaddr_in remaddr;
-    static socklen_t addrlen = sizeof(remaddr); 
+    static socklen_t addrlen = sizeof(remaddr);
     recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
     for (i = 0; buf[i]!='>'; i++) {
         // cout << buf[i];
@@ -78,11 +78,10 @@ int main() {
     int driveFD = spiSetup(DRIVE);
    // int armFD = spiSetup(ARM);
     while (1) {
-	read(sock, controls);
+	      read(sock, controls);
         bytes = getData(DRIVE, &controls[0], 1);
         // bytes = getData(ARM, &controls[1], 1);
         // cout << "drive = " << controls[0] << " arm = " << controls[1] << " bytes = " << bytes << endl;
     }
     return 0;
 }
-
