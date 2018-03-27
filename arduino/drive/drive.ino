@@ -21,9 +21,9 @@ int data;
 int ss = 53;
 
 int speed = 0;        //speed variable
-int filter = 0.1;      //fileter variable
-int limit = 100;
-int accelUp = 15;    // acceleration variable
+int filter = 0.1;     //fileter variable
+int limit = 80;
+int accelUp = 15;     // acceleration variable
 int accelDown = 12;
 //Filter
 int f_map[] = {0, 0};
@@ -60,35 +60,30 @@ void loop () {
   digitalWrite(ss, LOW);
   if ((SPSR & (1 << SPIF)) != 0) {
     data = SPDR;
-//    Serial.println(data);
     process(data);
     digitalWrite(ss, HIGH);
   }
 }
 
 void updateBits(int val) {
-  for (int i = 0;i<8;i++) 
+  for (int i = 0; i < 8; i++)
     bits[i] = getBit(val, i);
-//  display();
+  //  display();
 }
 
 void process(int input) {
   if (input) {
-    updateBits(data);
-    speed += accelUp;    // sq function
-    speed = (speed > limit) ? limit : speed;
+    updateBits(input);
+    speed = (speed >= limit) ? limit : speed + accelUp;
     Serial.println(speed);
     drive(speed, pwm);
   } else {
     while (speed > 0) {
-      speed = (speed < accelDown) ? 0 : speed-accelDown;
+      speed = (speed < accelDown) ? 0 : speed - accelDown;
+      Serial.println(speed);
       drive(speed, 0);
     }
   }
-}
-
-bool getBit(int n, int pos) {
-  return (n >> pos) & 1;
 }
 
 void drive(int spd, int pwm) {
@@ -96,8 +91,12 @@ void drive(int spd, int pwm) {
   act(LA1, abs(bits[0] - bits[3]), bits[0], pwm);               //  I  Cntrl    (Cntrl - I) Cntrl
   act(LA2, abs(bits[0] - bits[2]), bits[0], pwm);               //  0    1         1         1       //stop
   act(CAM, abs(bits[0] - bits[1]), bits[0], pwm);               //  1    0         abs(-1)   0
-}                                                            //  1    1          0        1
+}                                                               //  1    1          0        1
 
+
+bool getBit(int n, int pos) {
+  return (n >> pos) & 1;
+}
 void display() {
   for (int i = 0; i < 8; i++) {
     Serial.print(bits[i]);
@@ -116,7 +115,7 @@ void algo(int a, int b, int spd) {
 }
 
 void Left(int t) {
-  int x = map(t, -limit, limit, 26, 102); // forward
+  int x = map(t, -100, 100, 1, 127); // forward
   Serial.print("Left:");
   Serial.print(x);
   Serial.print(" ");
@@ -125,7 +124,7 @@ void Left(int t) {
 }
 
 void Right(int t) {
-  int x = map(t, -limit, limit, 152, 232); // backward
+  int x = map(t, -100, 100, 129, 256); // backward
   Serial.print(" Right:");
   Serial.print(x);
   Serial.print(" ");
@@ -139,12 +138,12 @@ void act(int arr[], boolean A, boolean B, int pwm) {
   analogWrite(arr[2], pwm);
 }
 
-void command(int x) {
-  Serial1.write(x);
-  delay(5);
-  Serial2.write(x);
-  delay(5);
-  Serial3.write(x);
-  delay(5);
+void command(int x) {                  //  High  Low  Latest
+  Serial1.write(x);                    //R 114   51    77.6
+  delay(5);                            //L 55.4  27.6  52.9
+  Serial2.write(x);                    //R 40.2  11.2  40.2
+  delay(5);                            //L 69.1  2.6   68.6
+  Serial3.write(x);                    //R 79.5  28.9  79.5
+  delay(5);                            //L 80    64.2  65.8
 }
 
