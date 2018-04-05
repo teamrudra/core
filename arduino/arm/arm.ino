@@ -160,7 +160,7 @@ void act(int arr[], boolean A, boolean B, int pwm) {
 void updateBits(int val) {
   for (int i = 0; i < 8; i++)
     bits[i] = getBit(val, i);
-  //   display();
+     display();
 }
 
 bool getBit(int n, int pos) {
