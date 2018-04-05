@@ -38,7 +38,7 @@ int main(){
                 if(recv_len<0)
 			cout<<"ERROR"<<endl;
 		else{
-			cout<<buf<<endl;
+			cout<<(int)buf<<endl;
 			continue;
 		}
         }
