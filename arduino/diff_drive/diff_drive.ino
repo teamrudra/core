@@ -21,6 +21,7 @@ int data;
 int ss = 53;
 
 bool flag = 0;
+int mul;
 
 int speed = 0;        //speed variable
 int filter = 0.3;    //fileter variable
@@ -105,47 +106,28 @@ void display() {
   Serial.println();
 }
 
-void algo(int a, int b, int spd) {
-  int mapper1 = spd * round((a + b) / 2.0);
-  int mapper2 = spd * round((a - b) / 2.0);
-
-  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0)
-    differntialUp(mapper1, mapper2);
-
-  if (flag && !((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0))
-    differntialDown(mapper1, mapper2);
-
-  f_map[0] = f_map[0] * filter + (1 - filter) * mapper1;
-  f_map[1] = f_map[1] * filter + (1 - filter) * mapper2;
-  Left(f_map[0]);
-  Right(f_map[1]);
-}
-
 void differntialDown(int &a, int &b) {
-  if (a == limit && f_map[0] <= a) {
-    while (a <= limit) {
-      a += 5;
+    while (mul*a < mul*b) {
+      a += mul*accelUp;
       f_map[0] = f_map[0] * filter + (1 - filter) * a;
       Left(f_map[0]);
-    }
-  }
-  else if (b == limit && f_map[1] <= b) {
-    while (b <= limit) {
-      b += 5;
-      f_map[1] = f_map[1] * filter + (1 - filter) * b;
       Right(f_map[1]);
     }
-  }
-  else flag = 0;
+    while (mul*b < mul*a) {
+      b += mul*accelUp;
+      f_map[1] = f_map[1] * filter + (1 - filter) * b;
+      Left(f_map[0]);
+      Right(f_map[1]);
+    }
+  flag = 0;
 }
 
-
 void differentialUp(int &a, int &b) {
-  if (a == 0 && (f_map[0] - accelDown) >= b / 2.0) {
-    a = f_map[0] - accelDown;
+  if (a == 0 && mul*(f_map[0] - mul*accelDown) >= mul*b / 2.0) {
+    a = f_map[0] - mul*accelDown;
   }
-  else if (b == 0 && (f_map[1] - accelDown) >= a / 2.0) {
-    b = f_map[1] - accelDown;
+  else if (b == 0 && mul*(f_map[1] - mul*accelDown) >= mul*a / 2.0) {
+    b = f_map[1] - mul*accelDown;
   }
   else {
     a = f_map[0];
@@ -154,6 +136,23 @@ void differentialUp(int &a, int &b) {
   flag = 1;
 }
 
+void algo(int a, int b, int spd) {
+  int mapper1 = spd * round((a + b) / 2.0);
+  int mapper2 = spd * round((a - b) / 2.0);
+
+  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0){
+    mul = ((mapper1>0)||(mapper2>0))?1:-1;
+    differentialUp(mapper1, mapper2);
+  }
+
+  if (flag && !((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0))
+    differntialDown(f_map[0], f_map[1]);
+
+  f_map[0] = f_map[0] * filter + (1 - filter) * mapper1;
+  f_map[1] = f_map[1] * filter + (1 - filter) * mapper2;
+  Left(f_map[0]);
+  Right(f_map[1]);
+}
 void Left(int t) {
   int x = map(t, -100, 100, 1, 127); // forward
   Serial.print("Left:");
