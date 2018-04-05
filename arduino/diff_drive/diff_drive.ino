@@ -20,6 +20,8 @@
 int data;
 int ss = 53;
 
+bool flag = 0;
+
 int speed = 0;        //speed variable
 int filter = 0.3;    //fileter variable
 int limit = 80;
@@ -50,8 +52,6 @@ void setup () {
   }
 
   Serial.begin(9600);
-//  Serial1.begin(9600);
-//  Serial2.begin(9600);
   Serial3.begin(9600);
   Serial.println("Setup");
 }
@@ -75,12 +75,12 @@ void process(int input) {
   if (input) {
     updateBits(input);
     speed = (speed >= limit) ? limit : speed + accelUp;
-//    Serial.println(speed);
+    //    Serial.println(speed);
     drive(speed, pwm);
   } else {
     while (speed > 0) {
       speed = (speed < accelDown) ? 0 : speed - accelDown;
-//      Serial.println(speed);
+      //      Serial.println(speed);
       drive(speed, 0);
     }
   }
@@ -108,10 +108,50 @@ void display() {
 void algo(int a, int b, int spd) {
   int mapper1 = spd * round((a + b) / 2.0);
   int mapper2 = spd * round((a - b) / 2.0);
+
+  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0)
+    differntialUp(mapper1, mapper2);
+
+  if (flag && !((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0))
+    differntialDown(mapper1, mapper2);
+
   f_map[0] = f_map[0] * filter + (1 - filter) * mapper1;
   f_map[1] = f_map[1] * filter + (1 - filter) * mapper2;
   Left(f_map[0]);
   Right(f_map[1]);
+}
+
+void differntialDown(int &a, int &b) {
+  if (a == limit && f_map[0] <= a) {
+    while (a <= limit) {
+      a += 5;
+      f_map[0] = f_map[0] * filter + (1 - filter) * a;
+      Left(f_map[0]);
+    }
+  }
+  else if (b == limit && f_map[1] <= b) {
+    while (b <= limit) {
+      b += 5;
+      f_map[1] = f_map[1] * filter + (1 - filter) * b;
+      Right(f_map[1]);
+    }
+  }
+  else flag = 0;
+}
+
+
+void differentialUp(int &a, int &b) {
+  if (a == 0 && (f_map[0] - accelDown) >= b / 2.0) {
+    a = f_map[0] - accelDown;
+  }
+  else if (b == 0 && (f_map[1] - accelDown) >= a / 2.0) {
+    b = f_map[1] - accelDown;
+  }
+  else {
+    a = f_map[0];
+    b = f_map[1];
+  }
+  flag = 1;
 }
 
 void Left(int t) {
@@ -138,12 +178,12 @@ void act(int arr[], boolean A, boolean B, int pwm) {
   analogWrite(arr[2], pwm);
 }
 
-void command(int x) {                  
-//  Serial1.write(x);                  
-//  delay(5);                           
-//  Serial2.write(x);                   
-//  delay(5);                           
-  Serial3.write(x);                    
-  delay(5);                            
+void command(int x) {
+  //  Serial1.write(x);
+  //  delay(5);
+  //  Serial2.write(x);
+  //  delay(5);
+  Serial3.write(x);
+  delay(5);
 }
 

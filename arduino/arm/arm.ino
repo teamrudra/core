@@ -28,16 +28,18 @@ int LA1[] =  { 35, 36, 7};                      // A, B, PWM long 0-1 up
 
 int GRP[] =  { 39, 41, 8};                      // A, B, PWM grp 0-1 up
 
-float a = 0.5, a1 = 0.7;
+float a = 0.9;
 
 int s[] = {1500, 1500, 1500};                    //servo controllers
 Servo yaw, pitch, roll;                          //Servo variables
 
-int speed = 0, pwm = 200 , grpwm = 150;
+int speed = 0, pwm = 200 , grpwm = 100;
 
 int limit  = 50;
-int accelUp = 10, accelDown = 10;
-int lfilter, gfilter;                             //linear actuator filter, gripper filter
+int accelUp = 1, accelDown = 5;
+int lfilter, gfilter,tt;                         //linear actuator filter, gripper filter
+
+int yawstep = 5,prstep = 1;                      //Servo steps 
 
 void setup() {
   //SPI
@@ -60,6 +62,7 @@ void setup() {
   pitch.attach(5);
   roll.attach(4);
   initial();
+  Serial3.write(64);
   Serial.println("Setup");
 }
 
@@ -67,6 +70,7 @@ void loop() {
   digitalWrite(ss, LOW);
   if ((SPSR & (1 << SPIF)) != 0) {
     data = SPDR;
+//    Serial.println(data);
     process(data);
     digitalWrite(ss, HIGH);
   }
@@ -76,8 +80,6 @@ void process(int input) {
   if (input) {
     updateBits(data);
     speed = (speed >= limit) ? limit : speed + accelUp;
-    //    Serial.print(speed);
-    //    Serial.print(" ");
     arm(speed, pwm, grpwm);
     ypr();
   } else {
@@ -89,41 +91,54 @@ void process(int input) {
 
 void arm(int speed, int pwm, int grpwm) {
   if (bits[0]) {
-    turntable(speed * (bits[7] - bits[6]));
+    turntable(speed * (bits[6] - bits[7]));
   }
   else {
-    turntable(0 * (bits[7] - bits[6]));
+    turntable(0 * (bits[6] - bits[7]));
     lfilter = lfilter * a + (1 - a) * pwm;
     gfilter = gfilter * a + (1 - a) * grpwm;
     act(LA1, (bits[5] && (!bits[2])), (bits[4] && (!bits[2])), lfilter);
     act(LA2, (bits[7] && (!bits[3]) && (!bits[1])), (bits[6] && (!bits[3]) && (!bits[1])), lfilter);
-    act(GRP, (bits[3] && (!bits[7]) && (!bits[6])), (bits[1] && (!bits[7]) && (!bits[6])), gfilter);
+    act(GRP, (bits[0] && (bits[1]) && (bits[2]) && (bits[3])), (bits[4] && (bits[5]) && (bits[6]) && (bits[7])), gfilter);
+//    act(GRP, (bits[3] && (!bits[7]) && (!bits[6])), (bits[1] && (!bits[7]) && (!bits[6])), gfilter);
   }
 }
 
+int safeservo(int x){
+   if(x>2300) return 2400;
+   else if(x<800) return 800;
+   else return x;
+}
+
 void ypr() {
-  if (bits[3]) {
-     s[0] += (bits[7]-bits[6]);
+  if(bits[1]&&bits[2]&&bits[3]){
+    initial();
+  }
+  else if (bits[3]) {
+     s[0] += yawstep*(bits[7]-bits[6]);
+     s[0] = safeservo(s[0]);
      Serial.print("yaw ");
      yaw.writeMicroseconds(s[0]);
   }
   else if (bits[2]) {
-     s[1] += (bits[4]-bits[5]);
-     s[2] += (bits[5]-bits[4]);
+     s[1] += prstep*(bits[4]-bits[5]);
+     s[2] += prstep*(bits[5]-bits[4]);
      Serial.print("pitch ");
+     s[1] = safeservo(s[1]);
+     s[2] = safeservo(s[2]);
      pitch.writeMicroseconds(s[1]);
      roll.writeMicroseconds(s[2]);
   }
   else if (bits[1]) {
-     s[1] += (bits[7]-bits[6]);
-     s[2] += (bits[7]-bits[6]);
+     s[1] += prstep*(bits[7]-bits[6]);
+     s[2] += prstep*(bits[7]-bits[6]);
      Serial.print("roll ");
+     s[1] = safeservo(s[1]);
+     s[2] = safeservo(s[2]);
      pitch.writeMicroseconds(s[1]);
      roll.writeMicroseconds(s[2]);
   }
-  else if(bits[1]&&bits[2]&&bits[3]){
-    initial();
-  }
+  
   Serial.print(s[0]);
   Serial.print(" ");
   Serial.print(s[1]);
@@ -133,14 +148,14 @@ void ypr() {
   Serial.println();
 }
 
-void turntable(int x) {
+void turntable(int x) {  
   int y = map(x, -100, 100, 1, 127);
-//  Serial.print(x);
-//  Serial.print(" ");
-//  Serial.println(y);
-  delay(10);
-  Serial3.write(y);
-  delay(10);
+  tt = (x)?tt * a + (1 - a) * y:64;
+  Serial.print(x);
+  Serial.print(" ");
+  Serial.println(tt);
+  Serial3.write(tt);
+  delay(5);
 }
 
 void act(int arr[], boolean A, boolean B, int pwm) {
@@ -160,7 +175,7 @@ void act(int arr[], boolean A, boolean B, int pwm) {
 void updateBits(int val) {
   for (int i = 0; i < 8; i++)
     bits[i] = getBit(val, i);
-  //   display();
+//     display();
 }
 
 bool getBit(int n, int pos) {
@@ -179,11 +194,9 @@ void initial()
 {
   //Initialize YPR
   Serial.println("Intializing YPR");
-  yaw.writeMicroseconds(1500);
-  pitch.writeMicroseconds(1500);
-  roll.writeMicroseconds(1500);
-  for (int i = 0; i < 3; i++) {
-    s[i] = 1500;
-  }
+  s[0] = 1500,s[1] = 1200,s[2] = 1800;
+  yaw.writeMicroseconds(s[0]);
+  pitch.writeMicroseconds(s[1]);
+  roll.writeMicroseconds(s[2]);
 }
 
