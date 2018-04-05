@@ -129,7 +129,6 @@ void Right(int t) {
   Serial.print(x);
   Serial.print(" ");
   Serial.println(t);
-  command(x-1);
   command(x);
 }
 
