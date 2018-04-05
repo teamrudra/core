@@ -20,13 +20,6 @@ using namespace std;
 const int HMC5883L_I2C_ADDR = 0x1E;
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
-void setup()
-{
-  int gpsdcheck =  gpsdintialise();
-  int compass_fd = compass_setup();
-
-}
-
 //==================================GPS=====================================
 int gpsdintialise(){
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
@@ -141,7 +134,8 @@ float get_bearing(float lat1, float lon1, float lat2, float lon2)
 //====================Distance========================
 float get_dist(float lat1, float lon1, float lat2, float lon2)
 {
-  double r = 6371000;
+  //from the Haversine formula
+  double r = 6371000;                      //radius of the earth in meters (6371km)
   float dlat = lat2 - lat1;
   float dlon = lon2 - lon1;
   float a = sin(dlat/2) * sin(lat/2) + cos(lat1) * cos(lat2) * sin(dlon/2) * sin(dlon/2);
@@ -157,33 +151,50 @@ void auto_bot(float bear, float dist, float head)
 {
   float diff = head - bear;
   diff = diff>0?diff:-diff;
-  if(diff > 2 && diff < 180)
+  // if(abs(diff)>180)
+  //   diff = (360-abs(diff))*diff/abs(diff);
+  cout<<"Diff"<<diff<<endl;
+  if(diff > 5 && diff < 180)
   {
     //left
+    cout<<"left"<<endl;
   } 
-  else if(diff > 180 && 360)
+  else if(diff >=180 && diff < 355)
   {
     //right
+    cout<<"right"<<endl;
   }
-  else if(diff >= 0 && diff <= 2)
+  else if((diff >= 0 && diff <= 5)||(diff >= 355 && diff <= 360))
   {
-    if(dist > 2)
+    if(dist > 3)
     {
       //forward
+      cout<<"forward"<<endl;
     } 
   }
   else 
   {
     //stop
+    cout<<"stop"<<endl;
   }
 
 
+}
+
+//======================Setup=========================
+int setup()
+{
+  int gpsdcheck =  gpsdintialise();
+  int compass_fd = compass_setup();
+
+  return compass_fd;
 }
 
 //======================main==========================
 int main(){
   double latitude , longitude;
   unsigned char buff[16];
+  int compass_fd = setup();
   while(1){
  
     float angle = compass(buff,compass_fd);
@@ -196,7 +207,9 @@ int main(){
     float bear = get_bearing(lat, lon, latitude, longitude);
     float dist = get_dist(lat, lon, latitude, longitude);
 
-    // cout<<latitude << "," <<longitude << ","<< get_bearing(lat, lon, latitude, longitude)<<endl;
+    auto_bot(bear, dist, angle);
+
+    cout<< latitude << "," << longitude << ","<< bear << "," << dist <<endl;
 
   }
   return 0;
