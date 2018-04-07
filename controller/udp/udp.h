@@ -3,6 +3,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <arpa/inet.h>
 
 #define BUFSIZE 2048
 #define TIMEOUT 1
@@ -12,11 +13,12 @@ using namespace std;
 
 class Udp {
     private:
-        unsigned char buf[BUFSIZE];
+        unsigned char buffer[BUFSIZE];
         int sock, bnd;
         struct sockaddr_in myaddr;
         struct sockaddr_in remaddr;
         socklen_t addrlen;
+        fd_set stReadFDS;
     public:
         Udp(int port);
         unsigned char* read();

@@ -5,3 +5,6 @@ EXECUTABLE=rudra
 
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(FLAGS) $(SOURCES) -o $@
+
+clean:
+	rm -rf *.o rudra
