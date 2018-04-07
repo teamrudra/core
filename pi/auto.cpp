@@ -10,12 +10,17 @@
 #include <linux/i2c-dev.h>
 #include <iostream>
 #include <cmath>
+#include <math.h>
 
 using namespace std;
+
+#define lat 12.82187
+#define lon 80.63217
 
 const int HMC5883L_I2C_ADDR = 0x1E;
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
+//==================================GPS=====================================
 int gpsdintialise(){
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
@@ -88,6 +93,7 @@ int compass_setup(){
 }
 
 float compass(unsigned char buf[], int fd){
+	
 	float angle;
         buf[0] = 0x03;
 
@@ -114,18 +120,97 @@ float compass(unsigned char buf[], int fd){
    return angle;
 }
 
-int main(){
-  double latitude , longitude;
+//=====================bearing========================
+float get_bearing(float lat1, float lon1, float lat2, float lon2)
+{
+  //from the Haversine formula
+  float y = sin(lon2-lon1)*cos(lat2);
+  float x = cos(lat1)*sin(lat2) - sin(lat1)*cos(lat2)*cos(lon2-lon1);
+  float bearing = atan2(y, x);
+
+  return bearing;
+}
+
+//====================Distance========================
+float get_dist(float lat1, float lon1, float lat2, float lon2)
+{
+  //from the Haversine formula
+  double r = 6371000;                      //radius of the earth in meters (6371km)
+  float dlat = lat2 - lat1;
+  float dlon = lon2 - lon1;
+  float a = sin(dlat/2) * sin(lat/2) + cos(lat1) * cos(lat2) * sin(dlon/2) * sin(dlon/2);
+  float c = 2 * atan2(sqrt(a), sqrt(1-a));
+  float d = r * c;
+
+  return d;
+}
+
+
+//====================Auto============================
+void auto_bot(float bear, float dist, float head)
+{
+  float diff = head - bear;
+  diff = diff>0?diff:-diff;
+  // if(abs(diff)>180)
+  //   diff = (360-abs(diff))*diff/abs(diff);
+  cout<<"Diff"<<diff<<endl;
+  if(diff > 5 && diff < 180)
+  {
+    //left
+    cout<<"left"<<endl;
+  } 
+  else if(diff >=180 && diff < 355)
+  {
+    //right
+    cout<<"right"<<endl;
+  }
+  else if((diff >= 0 && diff <= 5)||(diff >= 355 && diff <= 360))
+  {
+    if(dist > 3)
+    {
+      //forward
+      cout<<"forward"<<endl;
+    } 
+  }
+  else 
+  {
+    //stop
+    cout<<"stop"<<endl;
+  }
+
+
+}
+
+//======================Setup=========================
+int setup()
+{
   int gpsdcheck =  gpsdintialise();
   int compass_fd = compass_setup();
+
+  return compass_fd;
+}
+
+//======================main==========================
+int main(){
+  double latitude , longitude;
   unsigned char buff[16];
+  int compass_fd = setup();
   while(1){
+ 
     float angle = compass(buff,compass_fd);
     cout<<"Compass: "<<angle<<endl;
+ 
     get_latlon(latitude,longitude);
     cout.precision(6);
     cout.setf(std::ios::fixed, std::ios::floatfield);
-    cout<<latitude << "," <<longitude << '\n';
+ 
+    float bear = get_bearing(lat, lon, latitude, longitude);
+    float dist = get_dist(lat, lon, latitude, longitude);
+
+    auto_bot(bear, dist, angle);
+
+    cout<< latitude << "," << longitude << ","<< bear << "," << dist <<endl;
+
   }
   return 0;
 }
