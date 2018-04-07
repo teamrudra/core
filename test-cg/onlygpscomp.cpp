@@ -7,8 +7,6 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <errno.h>
-#include <wiringPi.h>
-#include <wiringPiSPI.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <string.h>
@@ -53,7 +51,7 @@ void selectDevice(int fd, int addr)
 {
     if (ioctl(fd, I2C_SLAVE, addr) < 0)
     {
-  //      cout<<"HMC5883L not present"<<endl;
+        cout<<"HMC5883L not present"<<endl;
     }
 }
 
@@ -65,7 +63,7 @@ void writeToDevice(int fd, int reg, int val)
 
     if (write(fd, buf, 2) != 2)
     {
-//        cout<<"Can't write to ADXL345\n";
+        cout<<"Can't write to ADXL345\n";
     }
 }
 
@@ -75,7 +73,7 @@ int setup(){
     if ((fd = open("/dev/i2c-1", O_RDWR)) < 0)
     {
         // Open port for reading and writing
-    //    cout<<"Failed to open i2c bus\n";
+        cout<<"Failed to open i2c bus\n";
         return 1;
     }
 
@@ -102,11 +100,11 @@ float compass(unsigned char buf[], int fd){
         if ((write(fd, buf, 1)) != 1)
         {
             // Send the register to read from
-//            cout<<"Error writing to i2c slave\n";
+            cout<<"Error writing to i2c slave\n";
         }
 
         if (read(fd, buf, 6) != 6) {
-  //          cout<<"Unable to read from HMC5883L\n";
+            cout<<"Unable to read from HMC5883L\n";
         } else {
             short x = (buf[0] << 8) | buf[1];
             short y = (buf[4] << 8) | buf[5];
@@ -137,7 +135,7 @@ void udp(int fd){
         s1=socket(AF_INET, SOCK_DGRAM, 0); // Creating a socket with IPv4 protocal (AF_INET) for UDP (SOCK_DGRAM) communication.
         
         if(s<0) {
-//                cout<<"Socket failed"<<endl;
+                cout<<"Socket failed"<<endl;
                 return;
         }
         
@@ -150,7 +148,7 @@ void udp(int fd){
 
         if(bind(s, (struct sockaddr*)&si_me,sizeof(si_me))<0) //Binding to the socket using the file discriptor
         {
-      //          cout<<"Binding failed"<<endl;
+                cout<<"Binding failed"<<endl;
                 return;
         }
 
@@ -160,7 +158,7 @@ void udp(int fd){
         string str;
         fstream f;
         f.open("/dev/ttyUSB0");
-       // cout<<"listening...."<<endl;
+        // cout<<"listening...."<<endl;
         string co;
         while(1){
             f >> str;
@@ -173,7 +171,7 @@ void udp(int fd){
             float angle=compass(buff,fd);
             // cout<<angle<<","<<co;
             string dat=co+","+to_string(angle);
-            cout<<dat<<endl;
+            // cout<<dat<<endl;
             int dlen=dat.size();
             unsigned char* uc = (unsigned char*)dat.c_str();
             sendto(s, uc, dlen, 0, (struct sockaddr*) &si_other, slen);
@@ -188,5 +186,4 @@ int main(){
     udp(fd);
     return 0;
 }
-
 
