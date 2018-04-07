@@ -76,12 +76,10 @@ void process(int input) {
   if (input) {
     updateBits(input);
     speed = (speed >= limit) ? limit : speed + accelUp;
-     //   Serial.println(speed);
     drive(speed, pwm);
   } else {
     while (speed > 0) {
       speed = (speed < accelDown) ? 0 : speed - accelDown;
-       //     Serial.println(speed);
       drive(speed, 0);
     }
   }
@@ -155,19 +153,19 @@ void algo(int a, int b, int spd) {
 }
 void Left(int t) {
   int x = map(t, -100, 100, 1, 127); // forward
-  Serial.print("Left:");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.print(t);
+//  Serial.print("Left:");
+//  Serial.print(x);
+//  Serial.print(" ");
+//  Serial.print(t);
   command(x);
 }
 
 void Right(int t) {
   int x = map(t, -100, 100, 129, 256); // backward
-  Serial.print(" Right:");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.println(t);
+//  Serial.print(" Right:");
+//  Serial.print(x);
+//  Serial.print(" ");
+//  Serial.println(t);
   command(x);
 }
 
