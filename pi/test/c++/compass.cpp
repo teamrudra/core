@@ -69,8 +69,8 @@ float compass(unsigned char buf[], int fd){
             short y = (buf[4] << 8) | buf[5];
             short z = (buf[2] << 8) | buf[3];
 
-            float angle = atan2(y, x) * 180 / M_PI;
-	    angle += 70;
+            float angle = atan2(y, x) * 180 / M_PI
+	           angle += 70;
             if(angle>360) angle-=360;
             if(angle<0) angle+=360;
 

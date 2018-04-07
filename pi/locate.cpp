@@ -16,7 +16,6 @@ using namespace std;
 const int HMC5883L_I2C_ADDR = 0x1E;
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
-//==================================GPS=====================================
 int gpsdintialise(){
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
@@ -89,7 +88,6 @@ int compass_setup(){
 }
 
 float compass(unsigned char buf[], int fd){
-	
 	float angle;
         buf[0] = 0x03;
 
@@ -131,4 +129,3 @@ int main(){
   }
   return 0;
 }
-
