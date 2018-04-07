@@ -76,12 +76,12 @@ void process(int input) {
   if (input) {
     updateBits(input);
     speed = (speed >= limit) ? limit : speed + accelUp;
-    //    Serial.println(speed);
+     //   Serial.println(speed);
     drive(speed, pwm);
   } else {
     while (speed > 0) {
       speed = (speed < accelDown) ? 0 : speed - accelDown;
-      //      Serial.println(speed);
+       //     Serial.println(speed);
       drive(speed, 0);
     }
   }
