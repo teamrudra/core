@@ -1,3 +1,5 @@
+#ifndef UDP_H
+#define UDP_H
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <cstring>
@@ -24,3 +26,5 @@ class Udp {
         unsigned char* read();
         int write(unsigned char *data);
 };
+
+#endif
