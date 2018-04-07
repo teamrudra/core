@@ -36,7 +36,7 @@ Servo yaw, pitch, roll;                          //Servo variables
 int speed = 0, pwm = 200 , grpwm = 100;
 
 int limit  = 50;
-int accelUp = 1;
+int accelUp = 3, accelDown = 3;
 int lfilter, gfilter,tt;                         //linear actuator filter, gripper filter
 
 int yawstep = 5,prstep = 1;                      //Servo steps 
@@ -82,22 +82,19 @@ void process(int input) {
     arm(1, pwm, grpwm);
     ypr();
   } else {
-      arm(0, 0, 0);
-      speed = 0;
+    arm(0, 0, 0);
   }
 }
 
 
-void arm(int val, int pwm, int grpwm) {
-    
-    turntable(bits[0] * val * (bits[6] - bits[7]));
+void arm(int ttval, int pwm, int grpwm) {
+    turntable(bits[0] * ttval * (bits[6] - bits[7]));
     
     lfilter = !bits[0] * (lfilter * a + (1 - a) * pwm);
     gfilter = bits[0] * (gfilter * a + (1 - a) * grpwm);
     
     act(LA1, (bits[5] && (!bits[2])), (bits[4] && (!bits[2])), lfilter);
     act(LA2, (bits[7] && (!bits[3]) && (!bits[1])), (bits[6] && (!bits[3]) && (!bits[1])), lfilter);
-
     act(GRP, (bits[0] && bits[1] && bits[2] && bits[3]), (bits[4] && bits[5] && bits[6] && bits[7]), gfilter);
 }
 
@@ -145,11 +142,12 @@ void ypr() {
 }
 
 void turntable(int x) {  
-  
-  speed = (speed >= limit) ? limit : speed + accelUp;   
-  
+  if (x)
+    speed = (speed >= limit) ? limit : speed + accelUp;  
+  else
+    speed = (speed < accelDown) ? 0 : speed - accelDown;
   int y = map(speed, -100, 100, 1, 127);
-  tt = (x)?tt * ttfilter + (1 - ttfilter) * y:64;
+  tt = x ? tt * ttfilter + (1 - ttfilter) * y : 64;
   Serial.print(x);
   Serial.print(" ");
   Serial.println(tt);

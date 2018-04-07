@@ -8,10 +8,8 @@ int main() {
     unsigned char *output;
     while (1) {
         output = (unsigned char*)groundStation.read();
-        for (int i=0;output[i]!='\0';i++)
-            cout << output[i];
-        cout << endl;
-        cout << groundStation.write(output);
+        cout << output << endl;
+        cout << groundStation.write((unsigned char*)"Hello Bro!");
     }
     return 0;
 }
