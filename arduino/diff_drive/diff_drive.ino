@@ -20,6 +20,9 @@
 int data;
 int ss = 53;
 
+bool flag = 0;
+int mul;
+
 int speed = 0;        //speed variable
 int filter = 0.3;    //fileter variable
 int limit = 80;
@@ -50,8 +53,6 @@ void setup () {
   }
 
   Serial.begin(9600);
-//  Serial1.begin(9600);
-//  Serial2.begin(9600);
   Serial3.begin(9600);
   Serial.println("Setup");
 }
@@ -75,12 +76,10 @@ void process(int input) {
   if (input) {
     updateBits(input);
     speed = (speed >= limit) ? limit : speed + accelUp;
-//    Serial.println(speed);
     drive(speed, pwm);
   } else {
     while (speed > 0) {
       speed = (speed < accelDown) ? 0 : speed - accelDown;
-//      Serial.println(speed);
       drive(speed, 0);
     }
   }
@@ -105,30 +104,68 @@ void display() {
   Serial.println();
 }
 
+void differntialDown(int &a, int &b) {
+    while (mul*a < mul*b) {
+      a += mul*accelUp;
+      f_map[0] = f_map[0] * filter + (1 - filter) * a;
+      Left(f_map[0]);
+      Right(f_map[1]);
+    }
+    while (mul*b < mul*a) {
+      b += mul*accelUp;
+      f_map[1] = f_map[1] * filter + (1 - filter) * b;
+      Left(f_map[0]);
+      Right(f_map[1]);
+    }
+  flag = 0;
+}
+
+void differentialUp(int &a, int &b) {
+  if (a == 0 && mul*(f_map[0] - mul*accelDown) >= mul*b / 2.0) {
+    a = f_map[0] - mul*accelDown;
+  }
+  else if (b == 0 && mul*(f_map[1] - mul*accelDown) >= mul*a / 2.0) {
+    b = f_map[1] - mul*accelDown;
+  }
+  else {
+    a = f_map[0];
+    b = f_map[1];
+  }
+  flag = 1;
+}
+
 void algo(int a, int b, int spd) {
   int mapper1 = spd * round((a + b) / 2.0);
   int mapper2 = spd * round((a - b) / 2.0);
+
+  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0){
+    mul = ((mapper1>0)||(mapper2>0))?1:-1;
+    differentialUp(mapper1, mapper2);
+  }
+
+  if (flag && !((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0))
+    differntialDown(f_map[0], f_map[1]);
+
   f_map[0] = f_map[0] * filter + (1 - filter) * mapper1;
   f_map[1] = f_map[1] * filter + (1 - filter) * mapper2;
   Left(f_map[0]);
   Right(f_map[1]);
 }
-
 void Left(int t) {
   int x = map(t, -100, 100, 1, 127); // forward
-  Serial.print("Left:");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.print(t);
+//  Serial.print("Left:");
+//  Serial.print(x);
+//  Serial.print(" ");
+//  Serial.print(t);
   command(x);
 }
 
 void Right(int t) {
   int x = map(t, -100, 100, 129, 256); // backward
-  Serial.print(" Right:");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.println(t);
+//  Serial.print(" Right:");
+//  Serial.print(x);
+//  Serial.print(" ");
+//  Serial.println(t);
   command(x);
 }
 
@@ -138,12 +175,12 @@ void act(int arr[], boolean A, boolean B, int pwm) {
   analogWrite(arr[2], pwm);
 }
 
-void command(int x) {                  
-//  Serial1.write(x);                  
-//  delay(5);                           
-//  Serial2.write(x);                   
-//  delay(5);                           
-  Serial3.write(x);                    
-  delay(5);                            
+void command(int x) {
+  //  Serial1.write(x);
+  //  delay(5);
+  //  Serial2.write(x);
+  //  delay(5);
+  Serial3.write(x);
+  delay(5);
 }
 
