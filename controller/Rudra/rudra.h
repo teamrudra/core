@@ -10,6 +10,9 @@
 #include <cmath>
 using namespace std;
 
+#define d2r 0.0174532914
+#define r2d 57.2957763671
+
 class Rudra {
     private:
     public:
