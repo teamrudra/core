@@ -9,7 +9,7 @@
 #include <stdio.h>
 using namespace std;
 
-#define SPI_CHAN                1
+#define SPI_CHAN                0
 #define speed                   10000
 
 
