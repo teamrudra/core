@@ -21,7 +21,7 @@ int Right = 16,Left = 64,Leftdrift = 192,Rightdrift = 144,fwd = 128,stop = 0;
 int err = 5,dat = 0;
 
 
-double destlat = 12.821186, destlon = 80.038238;
+double destlat = 12.821491, destlon = 80.038953;
 double latitude,longitude;
 double heading,bearing,dist;
 
@@ -39,7 +39,7 @@ double Compass(double heading){
 }
 
 void autodrive(double diff,double dist){
-    if(dist<2) dat = stop;
+    if(dist<1) dat = stop;
     else {
       if(diff > err) {
         if(dat == stop || dat == Left ) dat = Left;
