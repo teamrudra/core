@@ -25,7 +25,7 @@ unsigned char* Udp::read() {
         cout << "ERROR: setting timeout function in UDP" << endl;
     }
     if (FD_ISSET(sock, &stReadFDS) && 
-        recvfrom(sock, buffer, R_BUFSIZE, 0, (struct sockaddr *)&ground, &ground) > 0) {
+        recvfrom(sock, buffer, R_BUFSIZE, 0, (struct sockaddr *)&ground, &addrlen) > 0) {
         return buffer;
     } else {
         return (unsigned char*)"NULL";
