@@ -1,5 +1,5 @@
 #include <iostream>
-// #include <wiringPiSPI.h>
+ #include <wiringPiSPI.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <cstring>
@@ -14,23 +14,23 @@
 using namespace std;
 unsigned char buf[BUFSIZE];
 
-// int spiSetup(int spiChannel) {
-//     int fd;
-//     if ((fd = wiringPiSPISetup (spiChannel, SPEED)) < 0){
-//         cerr << "Can't open the SPI bus on channel : " << spiChannel << endl;
-//         return fd;
-//     }
-//     return fd;
-// }
+int spiSetup(int spiChannel) {
+    int fd;
+    if ((fd = wiringPiSPISetup (spiChannel, SPEED)) < 0){
+        cerr << "Can't open the SPI bus on channel : " << spiChannel << endl;
+        return fd;
+    }
+    return fd;
+}
 
-// int getData(int spiChannel, unsigned char *data, int size) {    
-//     int d;
-//     if ((d = wiringPiSPIDataRW (spiChannel, data, size)) < 0) {
-//         cerr << "SPI failure on channel : " << spiChannel << endl;
-//         return d;
-//     }
-//     return d;
-// }
+int getData(int spiChannel, unsigned char *data, int size) {
+    int d;
+    if ((d = wiringPiSPIDataRW (spiChannel, data, size)) < 0) {
+        cerr << "SPI failure on channel : " << spiChannel << endl;
+        return d;
+    }
+    return d;
+}
 
 int setupServer(int port) {
     int sock, bnd;
@@ -49,7 +49,7 @@ int setupServer(int port) {
 }
 
 
-unsigned char parse(unsigned char n[], int start, int end) {
+unsigned char parse(unsigned char *n, int start, int end) {
     int a = 0;
     for (int i = start; i<end; i++) {
         a += (n[i]-'0');
@@ -74,7 +74,7 @@ int read(int fd, unsigned char *controls) {
     if (select(fd+1, &stReadFDS, NULL, NULL, &stTimeOut) <0) {
         // cout<<stderr<<"Call to select() failed";
         // exit(1);
-    }    
+    }
 
     if (FD_ISSET(fd, &stReadFDS)) {
         recvlen = recvfrom(fd, buf, BUFSIZE, 0, (struct sockaddr *)&remaddr, &addrlen);
@@ -103,15 +103,14 @@ int main() {
     unsigned char controls[2];
     int bytes[] ={0};
     int sock = setupServer(PORT);
-    //int driveFD = spiSetup(DRIVE);
-    // int armFD = spiSetup(ARM);
+    int driveFD = spiSetup(DRIVE);
+   // int armFD = spiSetup(ARM);
     while (1) {
         read(sock, controls);
-       // bytes[0] = getData(DRIVE, &controls[0], 1);
-        // bytes[1] = getData(ARM, &controls[1], 1);
-        //cout<<bytes[0]<<" "<<(int)controls[1]<<bytes[1]<<(int)controls[1]<<endl;
-        // cout << "drive = " << controls[0] << " arm = " << controls[1] << " bytes = " << bytes << endl;
+        bytes[0] = getData(DRIVE, &controls[0], 1);
+     //   bytes[1] = getData(ARM, &controls[1], 1);
+     //   cout<<bytes[0]<<" "<<(int)controls[1]<<bytes[1]<<(int)controls[1]<<endl;
+     //   cout << "drive = " << controls[0] << " arm = " << controls[1] << " bytes = " << bytes << endl;
     }
     return 0;
 }
-
