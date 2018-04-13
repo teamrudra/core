@@ -1,3 +1,4 @@
+ls
 #include "Rudra/rudra.h"
 #include "hmc5883l/hmc5883l.h"
 #include "spi/spi.h"
@@ -41,11 +42,11 @@ double Compass(double heading){
 void autodrive(double diff,double dist){
     if(dist<2) dat = stop;
     else {
-      if(diff > err) {
+      if(diff < -err) {
         if(dat == stop || dat == Left ) dat = Left;
         else if(dat == fwd ||dat == Leftdrift) dat = Leftdrift;
         else dat = stop;
-      }else if(diff <- err){
+      }else if(diff > err){
         if(dat == stop || dat == Right ) dat = Right;
         else if(dat == fwd ||dat == Rightdrift) dat = Rightdrift;
         else dat = stop;
@@ -80,23 +81,12 @@ void loop() {
     dist = R.get_dist(latitude,longitude,destlat,destlon);
     autobot(bearing,dist,heading);
 //    printf("latitude %.6f longitude %.6f ",latitude,longitude);
-    cout <<"Bearing: "<<bearing<<" Heading: "<<heading<<" Distance: "<<dist;
+    cout <<"Bearing: "<<bearing<<" Heading: "<<heading<<" Distance: ";
 }
 
 int main() {
-//  try{
     setup();
-    dat = 0;
-    data = (unsigned char)dat;
-    S1.RW(&data,1);
     while (1) loop();
     return 0;
-//  }
-//  catch (){
-//	cout<<"Terminate";
-//        dat = 0;
-//        data = (unsigned char)dat;
-//	S1.RW(&data,1);
-//  }
 }
 
