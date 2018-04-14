@@ -17,7 +17,6 @@ class Helper {
     private:
     public:
       Helper();
-      int gpsdintialise();
       void get_latlon(double &latitude,double &longitude);
       double maps(double x, double in_min, double in_max, double out_min, double out_max);
       float get_bearing(float lat1, float lon1, float lat2, float lon2);
@@ -27,4 +26,3 @@ class Helper {
 };
 
 #endif
-

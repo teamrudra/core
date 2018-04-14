@@ -7,7 +7,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define R_BUFSIZE 64
+#define R_BUFSIZE 128
 #define W_BUFSIZE 256
 #define TIMEOUT 1
 #define U_TIMEOUT 0

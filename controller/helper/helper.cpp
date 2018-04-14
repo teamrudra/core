@@ -3,15 +3,9 @@
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
 Helper::Helper(){
-
-}
-
-int Helper::gpsdintialise(){
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
-    return 0;
   }
-  return 1;
 }
 
 void Helper::get_latlon(double &latitude,double &longitude){
@@ -83,4 +77,3 @@ double Helper::parse_C_to_F(unsigned char* buffer, int start,int end){
   // return atof(read);
   return *reinterpret_cast<float*>(buffer);
 }
-
