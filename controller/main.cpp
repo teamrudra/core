@@ -84,18 +84,10 @@ void loop() {
 }
 
 int main() {
-//  try{
     setup();
     dat = 0;
     data = (unsigned char)dat;
     S1.RW(&data,1);
     while (1) loop();
     return 0;
-//  }
-//  catch (){
-//	cout<<"Terminate";
-//        dat = 0;
-//        data = (unsigned char)dat;
-//	S1.RW(&data,1);
-//  }
 }
