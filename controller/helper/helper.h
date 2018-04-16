@@ -8,6 +8,9 @@
 #include <string.h>
 #include <iostream>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <sstream>
 using namespace std;
 
 #define d2r 0.0174532914
@@ -23,7 +26,8 @@ class Helper {
       float get_bearing(float lat1, float lon1, float lat2, float lon2);
       float get_dist(float lat1, float lon1, float lat2, float lon2);
       unsigned char parse(unsigned char *n, int start, int end) ;
-      double parse_C_to_F(unsigned char* buffer, int start,int end);
+      string toString(unsigned char* str);
+      vector<string> split(const string &s, char delim);
 };
 
 #endif

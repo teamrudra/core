@@ -1,32 +1,30 @@
 #include "udp/udp.h"
-#include "hmc5883l/hmc5883l.h"
-#include "spi/spi.h"
-#include <wiringSerial.h>
+#include "helper/helper.h"
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <vector>
+#include <sstream>
 
-#define GPS_PORT "/dev/ttyUSB0"
-HMC5883L compass;
-string data;
-int gps;
-
-void setup() {
-    if( hmc5883l_init(&compass) != HMC5883L_OKAY ) 
-        cout << "ERROR: initialising compass!" << endl;
-    gps = serialOpen ((char*)GPS_PORT, 9600) ;
-    // gps.open(GPS_PORT);
+Udp gs(3301);
+Helper H;
+vector<vector<double>> waypoints(5);
+//use stod
+void parse(unsigned char* str) {
+    string data = H.toString(str);
+    data = data.substr(1, data.size() - 2);
+    vector<string> tokens = H.split(data, '!');
+    for (vector<string>::iterator it = tokens.begin() ; it != tokens.end(); ++it)
+        cout << ' ' << *it;
+    cout << '\n';
+    // cout << data << endl;
 }
-
-void loop() {
-    hmc5883l_read(&compass);
-    // gps >> data;
-    // cout << hmc5883l._data.orientation_deg << endl;
-    cout << (char)serialGetchar (gps);
-}
-
 int main() {
-    setup();
-    while (1) loop();
+    unsigned char *data;
+    while(1) {
+        data = gs.read();
+        if (data[0] == '#')
+            parse(data);
+        // cout << data << endl;
+    }
     return 0;
 }

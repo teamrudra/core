@@ -33,4 +33,3 @@ int Autobot::update(double heading, Helper H){
   }
   return dat;
 }
-
