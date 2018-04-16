@@ -22,7 +22,7 @@ Udp gs(port);
 Helper H;
 Autobot A;
 
-int dat,isAuto,size;
+int dat,isAuto = 0,size;
 unsigned char data;
 unsigned char *coods;
 
@@ -31,7 +31,7 @@ double destlat[6],destlon[6];
 double heading;
 
 void kill() {
-  cout<<"Killed";
+  cout<<"Killed"<<endl;
   static unsigned char controls[2] = { (char)0, (char)0 };
   drive.RW(&controls[0],1);
   arm.RW(&controls[1], 1);
@@ -40,22 +40,23 @@ void kill() {
 
 void setup() {
     dat = 0,isAuto = 0,size = 0;
-//    coods = NULL;
-//    if(!H.gpsdintialise())
-//     cout<<"ERROR: initialising gpsd! "<<endl;
-    if( hmc5883l_init(&compass) != HMC5883L_OKAY )
-      cout << "ERROR: initialising compass!" << endl;
 
-//    kill();
+    if(!H.gpsdintialise())
+     cerr << "ERROR: initialising gpsd! "<<endl;
+
+    if( hmc5883l_init(&compass) != HMC5883L_OKAY )
+      cerr << "ERROR: initialising compass!" << endl;
+
+    kill();
 }
 
-double Compass(double heading) {
-  heading = compass._data.orientation_deg ;
+void Compass(double &heading) {
+  hmc5883l_read(&compass);
+  heading = compass._data.orientation_deg;
   heading = H.maps(heading,0,360,360,0) - 90;
   heading = (heading<0)?heading + 360:heading;
-  unsigned char* head = (unsigned char*)to_string(heading).c_str();
-  gs.write(head,port);
-  return heading;
+  unsigned char* head = (unsigned char*)(to_string(heading)).c_str();
+  gs.write(head,23907);
 }
 
 void removeCoods(){
@@ -66,12 +67,11 @@ void removeCoods(){
   size--;
 }
 
-
 void autonomous() {
   hmc5883l_read(&compass);
-  heading = Compass(heading);
+  Compass(heading);
   A.destlat = destlat[0],A.destlon = destlon[0];
-  //A.destlat = 12.821186,A.destlon = 80.038238;
+  A.destlat = 12.821186, A.destlon = 80.038238;
   A.update(heading,H);
   if(dat == -1){
     removeCoods();
@@ -110,9 +110,12 @@ void keyboard(unsigned char *coods) {
   controls[1] = H.parse(coods, mid+1, i);
   drive.RW(&controls[0],1);
   arm.RW(&controls[1], 1);
+  Compass(heading);
+//  cout<<"Heading: "<<heading<<endl;
 }
 
 void check(unsigned char* coods) {
+ if(coods != (unsigned char* )'0'){
   isAuto = (coods[0] == '$')? 2 : isAuto;
   isAuto = (coods[0] == '#')? 1 : isAuto;
   isAuto = (coods[0] == '<')? 0 : isAuto;
@@ -120,22 +123,27 @@ void check(unsigned char* coods) {
     removeCoods();
     cout << "Autonomous Stopped" << endl;
   }
-  else if(isAuto == 1){
+  if(isAuto == 1){
     size = parseCoods(coods);
     cout << "Autonomous running" << endl;
     autonomous();
   }
-  else if(isAuto == 0){
+  if(!isAuto){
     cout << "Keyboard running" << endl;
     keyboard(coods);
   }
+ }
 }
-
 
 void loop() {
   coods = gs.read();
-  if(coods == NULL) kill();
-  else check(coods);
+//  cout<<(unsigned char* )coods<<endl;
+  if(coods != (unsigned char* )'0' || isAuto == 1) {
+     check(coods);
+  }
+  else {
+     kill();
+  }
 }
 
 int main() {
@@ -143,4 +151,3 @@ int main() {
     while (1) loop();
     return 0;
 }
-

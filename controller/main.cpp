@@ -78,7 +78,7 @@ void autobot(unsigned char *coods) {
   dist = R.get_dist(latitude,longitude,destlat,destlon);
   cout <<"Bearing: "<<bearing<<" Heading: "<<heading<<" Distance: "<<dist;
   double diff = heading - bearing;
-  if(abs(diff)>180){
+  if(abs(diff)>180) {
     diff = (360-abs(diff))*diff/abs(diff);
     autodrive(-diff,dist);
   }
@@ -110,7 +110,7 @@ void check(unsigned char* coods) {
   } else {
     cout << "Keyboard running" << endl;
   }
-  cout << coods << endl;
+//  cout << coods << endl;
 }
 
 

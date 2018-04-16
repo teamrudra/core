@@ -28,11 +28,12 @@ unsigned char* Udp::read() {
         recvfrom(sock, buffer, R_BUFSIZE, 0, (struct sockaddr *)&ground, &addrlen) > 0) {
         return buffer;
     } else {
-        return (unsigned char*)"NULL";
+        return (unsigned char*)'0';
     }
 }
 
 int Udp::write(unsigned char *data, int port) {
+//    cout<<"port: "<<port<<" data: "<<data<<endl;
     ground.sin_port = htons(port);
     return sendto(sock, data, W_BUFSIZE, 0, (struct sockaddr*)&ground, sizeof(ground));
 }
