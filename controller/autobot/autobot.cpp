@@ -11,7 +11,7 @@ int Autobot::update(double heading, Helper H){
   difference = (abs(difference)>180)?-((360-abs(difference))*difference/abs(difference)):difference;
 
 //  printf("latitude %.6f longitude %.6f ",latitude,longitude);
-//  cout<<"heading: "<<heading<<" bearing: "<<bearing<<" difference: "<<difference<<endl;
+  cout<<"heading: "<<heading<<" bearing: "<<bearing<<" difference: "<<difference<<" distance:"<<distance<<endl;
 
   if( distance < ACCURACY){
     dat = -1;

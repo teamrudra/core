@@ -33,7 +33,6 @@ unsigned char* Udp::read(int sec,int usec) {
 }
 
 int Udp::write(unsigned char *data, int port) {
-//    cout<<"port: "<<port<<" data: "<<data<<endl;
     ground.sin_port = htons(port);
     return sendto(sock, data, W_BUFSIZE, 0, (struct sockaddr*)&ground, sizeof(ground));
 }

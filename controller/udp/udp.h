@@ -23,7 +23,7 @@ class Udp {
         fd_set stReadFDS;
     public:
         Udp(int port);
-        unsigned char* read();
+        unsigned char* read(int sec,int usec);
         int write(unsigned char *data, int port);
 };
 

@@ -83,3 +83,4 @@ vector<string> Helper::split(const string &s, char delim) {
 string Helper::toString(unsigned char* str) {
   return reinterpret_cast<char*>(str);
 }
+
