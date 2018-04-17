@@ -1,11 +1,15 @@
 CC=g++
 FLAGS=-lwiringPi -lgps
-SOURCES=final.cpp udp/udp.cpp spi/spi.cpp hmc5883l/hmc5883l.h helper/helper.cpp autobot/autobot.cpp
+MAIN=final.cpp
+SOURCES=udp/udp.cpp spi/spi.cpp hmc5883l/hmc5883l.h helper/helper.cpp autobot/autobot.cpp
 EXECUTABLE=final
 RM=rm -rf
 
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(FLAGS) $(SOURCES) -o $@
+	$(CC) $(FLAGS) $(MAIN) $(SOURCES) -o $@
+
+control:
+	$(CC) $(FLAGS) control.cpp udp/udp.cpp spi/spi.cpp -o control
 
 clean:
-	$(RM) *.o $(EXECUTABLE)
+	$(RM) *.o $(EXECUTABLE) control
