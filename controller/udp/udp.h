@@ -7,7 +7,8 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define BUFSIZE 2048
+#define R_BUFSIZE 128
+#define W_BUFSIZE 256
 #define TIMEOUT 1
 #define U_TIMEOUT 0
 
@@ -15,16 +16,15 @@ using namespace std;
 
 class Udp {
     private:
-        unsigned char buffer[BUFSIZE];
+        unsigned char buffer[R_BUFSIZE];
         int sock, bnd;
-        struct sockaddr_in myaddr;
-        struct sockaddr_in remaddr;
+        struct sockaddr_in rover, ground;
         socklen_t addrlen;
         fd_set stReadFDS;
     public:
         Udp(int port);
         unsigned char* read();
-        int write(unsigned char *data);
+        int write(unsigned char *data, int port);
 };
 
 #endif

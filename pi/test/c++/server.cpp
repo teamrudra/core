@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#define buflen 14
+#define buflen 110
 #define port 3301 //The port in which the connection has to be made to connect with the server.
 #define ip "192.168.43.216" //Host address has to be entered here.
 
@@ -38,7 +38,7 @@ int main(){
                 if(recv_len<0)
 			cout<<"ERROR"<<endl;
 		else{
-			cout<<(int)buf<<endl;
+			cout<<buf<<endl;
 			continue;
 		}
         }
