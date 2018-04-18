@@ -11,5 +11,8 @@ $(EXECUTABLE): $(OBJECTS)
 control:
 	$(CC) $(FLAGS) control.cpp udp/udp.cpp spi/spi.cpp -o control
 
+test:
+	$(CC) $(FLAGS) test.cpp udp/udp.cpp helper/helper.cpp -o test
+
 clean:
 	$(RM) *.o $(EXECUTABLE) control

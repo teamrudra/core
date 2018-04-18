@@ -3,6 +3,9 @@
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
 Helper::Helper(){
+}
+
+void Helper::gpsd_initialise() {
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
   }
@@ -29,13 +32,11 @@ void Helper::get_latlon(double &latitude,double &longitude){
   }
 }
 
-double Helper::maps(double x, double in_min, double in_max, double out_min, double out_max)
-{
+double Helper::maps(double x, double in_min, double in_max, double out_min, double out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-float Helper::get_bearing(float lat1, float lon1, float lat2, float lon2)
-{
+float Helper::get_bearing(float lat1, float lon1, float lat2, float lon2) {
   //from the Haversine formula
   lat1 *= d2r;
   lon1 *= d2r;
@@ -49,8 +50,7 @@ float Helper::get_bearing(float lat1, float lon1, float lat2, float lon2)
   return bearing;
 }
 
-float Helper::get_dist(float lat1, float lon1, float lat2, float lon2)
-{
+float Helper::get_dist(float lat1, float lon1, float lat2, float lon2) {
   //from the Haversine formula
   lat1 *= d2r;
   lat2 *= d2r;
@@ -67,6 +67,19 @@ unsigned char Helper::parse(unsigned char *n, int start, int end) {
         a *= 10;
     }
     return (unsigned char)(a/10);
+}
+
+vector<string> Helper::split(const string &s, char delim) {
+    stringstream ss(s);
+    string item;
+    vector<string> tokens;
+    while (getline(ss, item, delim))
+        tokens.push_back(item);
+    return tokens;
+}
+
+string Helper::toString(unsigned char* str) {
+  return reinterpret_cast<char*>(str);
 }
 
 double Helper::parse_C_to_F(unsigned char* buffer, int start,int end){
