@@ -3,16 +3,9 @@
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
 Helper::Helper(){
-<<<<<<< HEAD
-
 }
 
 int Helper::gpsdintialise(){
-=======
-}
-
-void Helper::gpsd_initialise() {
->>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
     return 0;
