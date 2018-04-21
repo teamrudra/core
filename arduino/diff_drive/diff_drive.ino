@@ -138,11 +138,16 @@ void algo(int a, int b, int spd) {
   int mapper1 = spd * round((a + b) / 2.0);
   int mapper2 = spd * round((a - b) / 2.0);
 
-  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0){
+  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd == limit){
     mul = ((mapper1>0)||(mapper2>0))?1:-1;
     differentialUp(mapper1, mapper2);
-  }
+  }  
 
+  if((abs(a + b) == 2 || abs(a - b) == 2)){
+    if(mapper1 == 0) mapper1 = mapper2/2;
+    else if(mapper2 == 0) mapper2 = mapper1/2;
+  }
+  
   if (flag && !((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0))
     differntialDown(f_map[0], f_map[1]);
 

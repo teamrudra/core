@@ -3,11 +3,16 @@
 gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
 Helper::Helper(){
-  if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
-    cerr << "No GPSD running.\n";
-  }
+
 }
 
+int Helper::gpsdintialise(){
+  if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
+    cerr << "No GPSD running.\n";
+    return 0;
+  }
+  return 1;
+}
 
 void Helper::get_latlon(double &latitude,double &longitude){
   struct gps_data_t *gpsd_data;
@@ -68,4 +73,13 @@ unsigned char Helper::parse(unsigned char *n, int start, int end) {
         a *= 10;
     }
     return (unsigned char)(a/10);
+}
+
+double Helper::parse_C_to_F(unsigned char* buffer, int start,int end){
+  // unsigned char read;
+  // for(int i=start;i<end;i++){
+  //   read[i] = buffer[i];
+  // }
+  // return atof(read);
+  return *reinterpret_cast<float*>(buffer);
 }
