@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cmath>
 #include "../helper/helper.h"
-<<<<<<< HEAD
 #define ACCURACY 1
 
 
@@ -19,7 +18,6 @@ public:
     int update(double heading,Helper H);
 
 };
-=======
 
 #define ACCURACY 1
 
@@ -34,5 +32,4 @@ class Autobot{
         int update(double heading,Helper H);
 };
 
->>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
 #endif
