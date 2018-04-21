@@ -8,6 +8,9 @@
 #include <string.h>
 #include <iostream>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <sstream>
 using namespace std;
 
 #define d2r 0.0174532914
@@ -17,13 +20,22 @@ class Helper {
     private:
     public:
       Helper();
+<<<<<<< HEAD
       int gpsdintialise();
+=======
+      void gpsd_initialise();
+>>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
       void get_latlon(double &latitude,double &longitude);
       double maps(double x, double in_min, double in_max, double out_min, double out_max);
       float get_bearing(float lat1, float lon1, float lat2, float lon2);
       float get_dist(float lat1, float lon1, float lat2, float lon2);
       unsigned char parse(unsigned char *n, int start, int end) ;
       double parse_C_to_F(unsigned char* buffer, int start,int end);
+<<<<<<< HEAD
+=======
+      string toString(unsigned char* str);
+      vector<string> split(const string &s, char delim);
+>>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
 };
 
 #endif

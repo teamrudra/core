@@ -1,5 +1,8 @@
 #include "autobot.h"
+<<<<<<< HEAD
 #include "../helper/helper.h"
+=======
+>>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
 
 Autobot::Autobot(){
 }
@@ -33,3 +36,7 @@ int Autobot::update(double heading, Helper H){
   }
   return dat;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
