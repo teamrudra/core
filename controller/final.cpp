@@ -40,15 +40,9 @@ void kill() {
 
 void setup() {
     dat = 0,isAuto = 0,size = 0;
-<<<<<<< HEAD
     coods = NULL;
     if(!H.gpsdintialise())
      cout<<"ERROR: initialising gpsd! "<<endl;
-=======
-//    coods = NULL;
-//    if(!H.gpsdintialise())
-//     cout<<"ERROR: initialising gpsd! "<<endl;
->>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
     if( hmc5883l_init(&compass) != HMC5883L_OKAY )
       cout << "ERROR: initialising compass!" << endl;
 
@@ -149,7 +143,3 @@ int main() {
     while (1) loop();
     return 0;
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
