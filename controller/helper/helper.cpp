@@ -71,8 +71,6 @@ unsigned char Helper::parse(unsigned char *n, int start, int end) {
     return (unsigned char)(a/10);
 }
 
-<<<<<<< HEAD
-=======
 vector<string> Helper::split(const string &s, char delim) {
     stringstream ss(s);
     string item;
@@ -86,7 +84,6 @@ string Helper::toString(unsigned char* str) {
   return reinterpret_cast<char*>(str);
 }
 
->>>>>>> 9f1c37eb45cc5787c71a1f43fe775c9510d49bba
 double Helper::parse_C_to_F(unsigned char* buffer, int start,int end){
   // unsigned char read;
   // for(int i=start;i<end;i++){
