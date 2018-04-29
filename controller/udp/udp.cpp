@@ -24,11 +24,11 @@ unsigned char* Udp::read() {
     if (select(sock + 1, &stReadFDS, NULL, NULL, &stTimeOut) < 0) {
         cout << "ERROR: setting timeout function in UDP" << endl;
     }
-    if (FD_ISSET(sock, &stReadFDS) && 
+    if (FD_ISSET(sock, &stReadFDS) &&
         recvfrom(sock, buffer, R_BUFSIZE, 0, (struct sockaddr *)&ground, &addrlen) > 0) {
         return buffer;
     } else {
-        return (unsigned char*)"NULL";
+        return (unsigned char*)"0";
     }
 }
 
@@ -36,4 +36,3 @@ int Udp::write(unsigned char *data, int port) {
     ground.sin_port = htons(port);
     return sendto(sock, data, W_BUFSIZE, 0, (struct sockaddr*)&ground, sizeof(ground));
 }
-

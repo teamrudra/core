@@ -27,8 +27,14 @@ unsigned char data;
 unsigned char *coods;
 
 //double destlat = 12.821186, destlon = 80.038238;
-double destlat[6],destlon[6];
 double heading;
+
+struct waypoints{
+  double destlat;
+  double destlon;
+};
+
+struct waypoints cord[5];
 
 void kill() {
   cout<<"Killed";
@@ -41,8 +47,8 @@ void kill() {
 void setup() {
     dat = 0,isAuto = 0,size = 0;
 //    coods = NULL;
-//    if(!H.gpsdintialise())
-//     cout<<"ERROR: initialising gpsd! "<<endl;
+   if(!H.gpsdintialise())
+    cout<<"ERROR: initialising gpsd! "<<endl;
     if( hmc5883l_init(&compass) != HMC5883L_OKAY )
       cout << "ERROR: initialising compass!" << endl;
 
@@ -60,8 +66,8 @@ double Compass(double heading) {
 
 void removeCoods(){
   for(int i = 1;i < size;i++){
-    destlat[i-1] = destlat[i];
-    destlon[i-1] = destlon[i];
+    cord[i-1].destlat = cord[i].destlat;
+    cord[i-1].destlon = cord[i].destlon;
   }
   size--;
 }
@@ -70,10 +76,11 @@ void removeCoods(){
 void autonomous() {
   hmc5883l_read(&compass);
   heading = Compass(heading);
-  A.destlat = destlat[0],A.destlon = destlon[0];
-  //A.destlat = 12.821186,A.destlon = 80.038238;
+  A.destlat = cord[0].destlat,A.destlon = cord[0].destlon;
+//  A.destlat = 12.821186, A.destlon = 80.038238;
   A.update(heading,H);
   if(dat == -1){
+    gs.write((unsigned char*)('*'),3301);
     removeCoods();
     //delay()
   }
@@ -83,22 +90,22 @@ void autonomous() {
   }
 }
 
-int parseCoods(unsigned char *coods) {
-  static int i, j = 0, start = 1, end;
-  for (i = 1, j = 0; coods[i]!='$'; i++) {
-    if(coods[i] == ',') {
-      end = i;
-      destlat[j] = H.parse_C_to_F(coods,start,end);
-      start = end + 1;
-    }
-    else if(coods[i] == '!'){
-      end = i;
-      destlon[j] = H.parse_C_to_F(coods,start,end);
-      start = end + 1;
-      j++;
-    }
+void getdestlatlon(string point,int i){
+  vector<string> token = H.split(point, ',');
+  cord[i].destlat = stod(token[0]);
+  cord[i].destlon = stod(token[1]);
+}
+
+int parseCoods(unsigned char* coods) {
+  string data = H.toString(coods);
+  data = data.substr(1, data.size() - 2);
+  vector<string> tokens = H.split(data, '!');
+  int i = 0;
+  for (vector<string>::iterator it = tokens.begin() ; it != tokens.end(); ++it,i++){
+    getdestlatlon(*it,i);
+//    cout << ' ' << *it;
   }
-  return j;
+  return tokens.size();
 }
 
 void keyboard(unsigned char *coods) {
@@ -113,6 +120,7 @@ void keyboard(unsigned char *coods) {
 }
 
 void check(unsigned char* coods) {
+ if(coods != (unsigned char* )"0"){
   isAuto = (coods[0] == '$')? 2 : isAuto;
   isAuto = (coods[0] == '#')? 1 : isAuto;
   isAuto = (coods[0] == '<')? 0 : isAuto;
@@ -121,11 +129,12 @@ void check(unsigned char* coods) {
     cout << "Autonomous Stopped" << endl;
   }
   else if(isAuto == 1){
+    gs.write((unsigned char*)('*'),3301);
     size = parseCoods(coods);
     cout << "Autonomous running" << endl;
     autonomous();
   }
-  else if(isAuto == 0){
+  else if(!isAuto){
     cout << "Keyboard running" << endl;
     keyboard(coods);
   }
@@ -134,13 +143,16 @@ void check(unsigned char* coods) {
 
 void loop() {
   coods = gs.read();
-  if(coods == NULL) kill();
-  else check(coods);
+  if(coods != (unsigned char* )"0" || isAuto == 1) {
+     check(coods);
+  }
+  else {
+     kill();
+  }
 }
 
-int main() {
+int main(){
     setup();
     while (1) loop();
     return 0;
 }
-
