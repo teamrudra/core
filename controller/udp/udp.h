@@ -9,7 +9,7 @@
 
 #define R_BUFSIZE 128
 #define W_BUFSIZE 256
-#define TIMEOUT 1
+#define TIMEOUT 0
 #define U_TIMEOUT 0
 
 using namespace std;

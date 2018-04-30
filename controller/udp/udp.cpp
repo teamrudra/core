@@ -14,26 +14,26 @@ Udp::Udp(int port) {
     }
 }
 
-unsigned char* Udp::read() {
+unsigned char* Udp::read(int sec,int usec) {
     static struct timeval stTimeOut;
-    stTimeOut.tv_sec = TIMEOUT;
-    stTimeOut.tv_usec = U_TIMEOUT;
+    stTimeOut.tv_sec = sec;
+    stTimeOut.tv_usec = usec;
     fd_set stReadFDS;
     FD_ZERO(&stReadFDS);
     FD_SET(sock, &stReadFDS);
     if (select(sock + 1, &stReadFDS, NULL, NULL, &stTimeOut) < 0) {
         cout << "ERROR: setting timeout function in UDP" << endl;
     }
-    if (FD_ISSET(sock, &stReadFDS) && 
+    if (FD_ISSET(sock, &stReadFDS) &&
         recvfrom(sock, buffer, R_BUFSIZE, 0, (struct sockaddr *)&ground, &addrlen) > 0) {
         return buffer;
     } else {
-        return (unsigned char*)"NULL";
+        return (unsigned char*)"0";
     }
 }
 
 int Udp::write(unsigned char *data, int port) {
+//    cout<<"port: "<<port<<" data: "<<data<<endl;
     ground.sin_port = htons(port);
     return sendto(sock, data, W_BUFSIZE, 0, (struct sockaddr*)&ground, sizeof(ground));
 }
-
