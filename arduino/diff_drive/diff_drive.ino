@@ -61,6 +61,7 @@ void loop () {
   digitalWrite(ss, LOW);
   if ((SPSR & (1 << SPIF)) != 0) {
     data = SPDR;
+    Serial.println(data);
     process(data);
     digitalWrite(ss, HIGH);
   }
@@ -156,21 +157,22 @@ void algo(int a, int b, int spd) {
   Left(f_map[0]);
   Right(f_map[1]);
 }
+
 void Left(int t) {
   int x = map(t, -100, 100, 1, 127); // forward
-//  Serial.print("Left:");
-//  Serial.print(x);
-//  Serial.print(" ");
-//  Serial.print(t);
+  Serial.print("Left:");
+  Serial.print(x);
+  Serial.print(" ");
+  Serial.print(t);
   command(x);
 }
 
 void Right(int t) {
   int x = map(t, -100, 100, 129, 256); // backward
-//  Serial.print(" Right:");
-//  Serial.print(x);
-//  Serial.print(" ");
-//  Serial.println(t);
+  Serial.print(" Right:");
+  Serial.print(x);
+  Serial.print(" ");
+  Serial.println(t);
   command(x);
 }
 
