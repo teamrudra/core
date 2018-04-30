@@ -14,10 +14,10 @@ Udp::Udp(int port) {
     }
 }
 
-unsigned char* Udp::read() {
+unsigned char* Udp::read(int sec,int usec) {
     static struct timeval stTimeOut;
-    stTimeOut.tv_sec = TIMEOUT;
-    stTimeOut.tv_usec = U_TIMEOUT;
+    stTimeOut.tv_sec = sec;
+    stTimeOut.tv_usec = usec;
     fd_set stReadFDS;
     FD_ZERO(&stReadFDS);
     FD_SET(sock, &stReadFDS);

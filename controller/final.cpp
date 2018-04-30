@@ -13,12 +13,13 @@
 #define DRIVE 1
 #define ARM 0
 #define speed 1000000
-#define port 3301
+#define portW 23907
+#define portR 3301
 
 Spi drive(DRIVE,speed);
 Spi arm(ARM, speed);
 HMC5883L compass;
-Udp gs(port);
+Udp gs(portR);
 Helper H;
 Autobot A;
 
@@ -36,6 +37,10 @@ struct waypoints{
 
 struct waypoints cord[5];
 
+string message = "";
+
+unsigned char* value;
+
 void kill() {
   cout<<"Killed";
   static unsigned char controls[2] = { (char)0, (char)0 };
@@ -51,42 +56,53 @@ void setup() {
     cout<<"ERROR: initialising gpsd! "<<endl;
     if( hmc5883l_init(&compass) != HMC5883L_OKAY )
       cout << "ERROR: initialising compass!" << endl;
-
-//    kill();
+   kill();
 }
 
-double Compass(double heading) {
+double Compass() {
+  hmc5883l_read(&compass);
   heading = compass._data.orientation_deg ;
   heading = H.maps(heading,0,360,360,0) - 90;
   heading = (heading<0)?heading + 360:heading;
-  unsigned char* head = (unsigned char*)to_string(heading).c_str();
-  gs.write(head,port);
-  return heading;
+  message = "!" + to_string(heading) + "!";
+  value = (unsigned char*)message.c_str();
+  gs.write(value,portW);
 }
 
-void removeCoods(){
-  for(int i = 1;i < size;i++){
-    cord[i-1].destlat = cord[i].destlat;
-    cord[i-1].destlon = cord[i].destlon;
-  }
-  size--;
+void removeCoods(int check){
+  if(check){
+    for(int i = 1;i < size;i++){
+      cord[i-1].destlat = cord[i].destlat;
+      cord[i-1].destlon = cord[i].destlon;
+    }
+   size--;
+ }else{
+   for(int i=0;i<size;i++){
+     cord[i].destlat = 0;
+     cord[i].destlon = 0;
+   }
+   size = 0;
+ }
 }
-
 
 void autonomous() {
-  hmc5883l_read(&compass);
-  heading = Compass(heading);
-  A.destlat = cord[0].destlat,A.destlon = cord[0].destlon;
-//  A.destlat = 12.821186, A.destlon = 80.038238;
-  A.update(heading,H);
-  if(dat == -1){
-    gs.write((unsigned char*)('*'),3301);
-    removeCoods();
-    //delay()
-  }
-  else {
-    data = (unsigned char)dat;
-    drive.RW(&data,1);
+ while(1){
+    coods = gs.read(0,200000);
+    if(coods[0] == '$') {
+      removeCoods(0);
+      break;
+    }
+    Compass();
+    A.destlat = cord[0].destlat,A.destlon = cord[0].destlon;
+  //  A.destlat = 12.821186, A.destlon = 80.038238;
+    dat = A.update(heading,H);
+    if(dat == -1){
+      break;
+    }
+    else {
+      data = (unsigned char)dat;
+      drive.RW(&data,1);
+    }
   }
 }
 
@@ -94,6 +110,7 @@ void getdestlatlon(string point,int i){
   vector<string> token = H.split(point, ',');
   cord[i].destlat = stod(token[0]);
   cord[i].destlon = stod(token[1]);
+  cout<<cord[i].destlat<<" "<<cord[i].destlon<<endl;
 }
 
 int parseCoods(unsigned char* coods) {
@@ -103,13 +120,13 @@ int parseCoods(unsigned char* coods) {
   int i = 0;
   for (vector<string>::iterator it = tokens.begin() ; it != tokens.end(); ++it,i++){
     getdestlatlon(*it,i);
-//    cout << ' ' << *it;
   }
   return tokens.size();
 }
 
 void keyboard(unsigned char *coods) {
   static int i, mid;
+  Compass();
   static unsigned char controls[2];
   for (i = 0; coods[i]!='>'; i++)
     mid = (coods[i] == ',') ? i : mid;
@@ -120,30 +137,51 @@ void keyboard(unsigned char *coods) {
 }
 
 void check(unsigned char* coods) {
- if(coods != (unsigned char* )"0"){
-  isAuto = (coods[0] == '$')? 2 : isAuto;
-  isAuto = (coods[0] == '#')? 1 : isAuto;
-  isAuto = (coods[0] == '<')? 0 : isAuto;
-  if (isAuto == 2 && size > 0 ) {
-    removeCoods();
-    cout << "Autonomous Stopped" << endl;
-  }
-  else if(isAuto == 1){
-    gs.write((unsigned char*)('*'),3301);
-    size = parseCoods(coods);
-    cout << "Autonomous running" << endl;
-    autonomous();
-  }
-  else if(!isAuto){
-    cout << "Keyboard running" << endl;
-    keyboard(coods);
-  }
+    isAuto = (coods[0] == '$')? 2 : isAuto;
+    isAuto = (coods[0] == '#')? 1 : isAuto;
+    isAuto = (coods[0] == '<')? 0 : isAuto;
+    if (isAuto == 2 && size > 0 ) {
+          removeCoods(0);
+          cout << "Autonomous Stopped" << endl;
+    }
+    else if(isAuto == 1){
+          size = parseCoods(coods);
+          cout << "Autonomous running" << endl;
+          cout<<heading;
+          message = "$" + to_string(heading) + ",%";
+          value = (unsigned char*)message.c_str();
+          gs.write(value,portW);
+          if(coods[0] == '@'){
+            autonomous();
+            message = "$" + to_string(heading) + ",Final destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
+            value = (unsigned char*)message.c_str();
+            gs.write(value,portW);
+            removeCoods(1);
+          }
+          else if(coods[0] == '*'){
+            for(int i=0;i<size;i++){
+              autonomous();
+              if(i == size-1)
+                message = "$" + to_string(heading) + ",Final destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
+              else
+                message = "$" + to_string(heading) + ",Destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
+
+              value = (unsigned char*)message.c_str();
+              gs.write(value,portW);
+              removeCoods(1);
+            }
+          }
+    }
+    else {
+          cout << "Keyboard running" << endl;
+          keyboard(coods);
+    }
 }
 
-
 void loop() {
-  coods = gs.read();
-  if(coods != (unsigned char* )"0" || isAuto == 1) {
+  coods = gs.read(1,0);
+  cout<<" "<<coods[0]<<endl;
+  if(coods[0] != '0') {
      check(coods);
   }
   else {
