@@ -89,7 +89,6 @@ void autonomous() {
  while(1){
     coods = gs.read(0,200000);
     if(coods[0] == '$') {
-      removeCoods(0);
       break;
     }
     Compass();
@@ -97,6 +96,8 @@ void autonomous() {
   //  A.destlat = 12.821186, A.destlon = 80.038238;
     dat = A.update(heading,H);
     if(dat == -1){
+      if(coods[0] == '$')
+        removeCoods(0);
       break;
     }
     else {
