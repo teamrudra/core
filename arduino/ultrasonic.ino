@@ -8,22 +8,22 @@ const int echoPin = 8;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   int d, in, cm;
 
-  pinMode(trigPin, OUTPUT);
   digitalWrite(trigPin, LOW);
   delay(2);
   digitalWrite(trigPin, HIGH);
   delay(2);
   digitalWrite(trigPin, LOW);
 
-  pinMode(echoPin, INPUT);
   d = pulseIn(echoPin, HIGH);
-  s.Smooth(d);
+  d = s.Smooth(d);
 
   in = microToInch(d);
   cm = microToCm(d);
