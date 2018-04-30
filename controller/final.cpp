@@ -23,7 +23,7 @@ Udp gs(portR);
 Helper H;
 Autobot A;
 
-int dat,isAuto,size;
+int dat,isAuto = 0,size;
 unsigned char data;
 unsigned char *coods;
 
@@ -42,7 +42,7 @@ string message = "";
 unsigned char* value;
 
 void kill() {
-  cout<<"Killed";
+  cout<<"Killed"<<endl;
   static unsigned char controls[2] = { (char)0, (char)0 };
   drive.RW(&controls[0],1);
   arm.RW(&controls[1], 1);
@@ -135,6 +135,8 @@ void keyboard(unsigned char *coods) {
   controls[1] = H.parse(coods, mid+1, i);
   drive.RW(&controls[0],1);
   arm.RW(&controls[1], 1);
+  Compass(heading);
+//  cout<<"Heading: "<<heading<<endl;
 }
 
 void check(unsigned char* coods) {
