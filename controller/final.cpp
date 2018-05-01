@@ -64,7 +64,7 @@ double Compass() {
   heading = compass._data.orientation_deg ;
   heading = H.maps(heading,0,360,360,0) - 90;
   heading = (heading<0)?heading + 360:heading;
-  message = "!" + to_string(heading) + "!";
+  message = "$," + to_string(heading) + ",!";
   value = (unsigned char*)message.c_str();
   gs.write(value,portW);
 }
@@ -149,12 +149,12 @@ void check(unsigned char* coods) {
           size = parseCoods(coods);
           cout << "Autonomous running" << endl;
           cout<<heading;
-          message = "$" + to_string(heading) + ",%";
+          message = "$," + to_string(heading) + ",%,";
           value = (unsigned char*)message.c_str();
           gs.write(value,portW);
           if(coods[0] == '@'){
             autonomous();
-            message = "$" + to_string(heading) + ",Final destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
+            message = "$," + to_string(heading) + ",Final destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached," + "~,";
             value = (unsigned char*)message.c_str();
             gs.write(value,portW);
             removeCoods(1);
@@ -163,10 +163,9 @@ void check(unsigned char* coods) {
             for(int i=0;i<size;i++){
               autonomous();
               if(i == size-1)
-                message = "$" + to_string(heading) + ",Final destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
+                message = "$," + to_string(heading) + ",Final destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
               else
-                message = "$" + to_string(heading) + ",Destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
-
+                message = "$," + to_string(heading) + ",Destination: " + to_string(cord[0].destlat) + " " + to_string(cord[0].destlon) + "reached,";
               value = (unsigned char*)message.c_str();
               gs.write(value,portW);
               removeCoods(1);
