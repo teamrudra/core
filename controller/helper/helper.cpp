@@ -5,10 +5,12 @@ gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 Helper::Helper(){
 }
 
-void Helper::gpsd_initialise() {
+int Helper::gpsdintialise(){
   if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
+    return 0;
   }
+  return 1;
 }
 
 void Helper::get_latlon(double &latitude,double &longitude){
@@ -80,13 +82,4 @@ vector<string> Helper::split(const string &s, char delim) {
 
 string Helper::toString(unsigned char* str) {
   return reinterpret_cast<char*>(str);
-}
-
-double Helper::parse_C_to_F(unsigned char* buffer, int start,int end){
-  // unsigned char read;
-  // for(int i=start;i<end;i++){
-  //   read[i] = buffer[i];
-  // }
-  // return atof(read);
-  return *reinterpret_cast<float*>(buffer);
 }

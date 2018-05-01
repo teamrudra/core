@@ -1,4 +1,4 @@
-CC=g++
+CC=sudo g++
 FLAGS=-lwiringPi -lgps
 MAIN=final.cpp
 SOURCES=udp/udp.cpp spi/spi.cpp hmc5883l/hmc5883l.h helper/helper.cpp autobot/autobot.cpp
