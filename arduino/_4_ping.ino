@@ -2,8 +2,8 @@
 
 SnapFilter s( 0.01, 3, 255);
 
-int trigPin[] = {22, 24, 26, 28};
-int echoPin[] = {23, 25, 27, 29};
+int trigPin[] = {0, 7, 10, 15};
+int echoPin[] = {1, 6, 11, 14};
 
 int i;
 int d[4], in[4], cm[4];
