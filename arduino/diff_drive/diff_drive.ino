@@ -24,10 +24,10 @@ bool flag = 0;
 int mul;
 
 int speed = 0;        //speed variable
-int filter = 0.3;    //fileter variable
+int filter = 0.8;    //fileter variable
 int limit = 80;
-int accelUp = 2;     // acceleration variable
-int accelDown = 2;
+int accelUp = 1;     // acceleration variable
+int accelDown = 1;
 //Filter
 int f_map[] = {0, 0};
 
@@ -35,9 +35,9 @@ int f_map[] = {0, 0};
 int bits[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 //Friglie and Camera motor pins
-int LA1[] = {25, 27, 8};
+int LA1[] = {41, 43, 8};
 int LA2[] = {46, 48, 7};
-int CAM[] = {47, 49, 3};
+int CAM[] = {25, 27, 6};
 int pwm = 200;
 
 void setup () {
@@ -54,14 +54,14 @@ void setup () {
 
   Serial.begin(9600);
   Serial3.begin(9600);
-  Serial.println("Setup");
+//  Serial.println("Setup");
 }
 
 void loop () {
   digitalWrite(ss, LOW);
   if ((SPSR & (1 << SPIF)) != 0) {
     data = SPDR;
-    Serial.println(data);
+//    Serial.println(data);
     process(data);
     digitalWrite(ss, HIGH);
   }
@@ -160,19 +160,19 @@ void algo(int a, int b, int spd) {
 
 void Left(int t) {
   int x = map(t, -100, 100, 1, 127); // forward
-  Serial.print("Left:");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.print(t);
+//  Serial.print("Left:");
+//  Serial.print(x);
+//  Serial.print(" ");
+//  Serial.print(t);
   command(x);
 }
 
 void Right(int t) {
   int x = map(t, -100, 100, 129, 256); // backward
-  Serial.print(" Right:");
-  Serial.print(x);
-  Serial.print(" ");
-  Serial.println(t);
+//  Serial.print(" Right:");
+//  Serial.print(x);
+//  Serial.print(" ");
+//  Serial.println(t);
   command(x);
 }
 
