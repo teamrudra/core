@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include "../helper/helper.h"
-#define ACCURACY 1
+#define ACCURACY 1.5
 
 class Autobot{
 private:
@@ -17,3 +17,5 @@ public:
     int update(double heading,Helper H);
 
 };
+
+#endif
