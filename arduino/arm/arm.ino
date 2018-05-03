@@ -83,6 +83,7 @@ void process(int input) {
       turntable(speed * (bits[6] - bits[7]));
       dir = (bits[6] - bits[7]);
     }
+    
     control(pwm, grpwm);
     ypr();
   }
@@ -96,7 +97,7 @@ void process(int input) {
 }
 
 void control(int pwm, int grpwm) {
-
+  lup();
   lfilter = !bits[0] * (lfilter * a + (1 - a) * pwm);
 
   act(LA1, (bits[5] && (!bits[2])), (bits[4] && (!bits[2])), lfilter);
@@ -105,6 +106,10 @@ void control(int pwm, int grpwm) {
   act(GRP, (bits[1] && bits[2]), (bits[2] && bits[3]), grpwm);
 }
 
+void lup(){
+  pwm = bits[4]||bits[5]||bits[6]||bits[7]?++pwm:50;
+  pwm = pwm>150?150:pwm;
+}
 int safeservo(int x) {
   if (x > 2300) return 2400;
   else if (x < 800) return 800;
