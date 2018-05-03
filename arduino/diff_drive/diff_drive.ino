@@ -24,10 +24,10 @@ bool flag = 0;
 int mul;
 
 int speed = 0;        //speed variable
-int filter = 0.3;    //fileter variable
+int filter = 0.8;    //fileter variable
 int limit = 80;
-int accelUp = 2;     // acceleration variable
-int accelDown = 2;
+int accelUp = 1;     // acceleration variable
+int accelDown = 1;
 //Filter
 int f_map[] = {0, 0};
 
@@ -35,9 +35,9 @@ int f_map[] = {0, 0};
 int bits[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 //Friglie and Camera motor pins
-int LA1[] = {25, 27, 8};
+int LA1[] = {41, 43, 8};
 int LA2[] = {46, 48, 7};
-int CAM[] = {47, 49, 3};
+int CAM[] = {25, 27, 6};
 int pwm = 200;
 
 void setup () {
@@ -54,13 +54,14 @@ void setup () {
 
   Serial.begin(9600);
   Serial3.begin(9600);
-  Serial.println("Setup");
+//  Serial.println("Setup");
 }
 
 void loop () {
   digitalWrite(ss, LOW);
   if ((SPSR & (1 << SPIF)) != 0) {
     data = SPDR;
+//    Serial.println(data);
     process(data);
     digitalWrite(ss, HIGH);
   }
@@ -138,11 +139,16 @@ void algo(int a, int b, int spd) {
   int mapper1 = spd * round((a + b) / 2.0);
   int mapper2 = spd * round((a - b) / 2.0);
 
-  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0){
+  if ((abs(a + b) == 2 || abs(a - b) == 2) && spd == limit){
     mul = ((mapper1>0)||(mapper2>0))?1:-1;
     differentialUp(mapper1, mapper2);
-  }
+  }  
 
+  if((abs(a + b) == 2 || abs(a - b) == 2)){
+    if(mapper1 == 0) mapper1 = mapper2/2;
+    else if(mapper2 == 0) mapper2 = mapper1/2;
+  }
+  
   if (flag && !((abs(a + b) == 2 || abs(a - b) == 2) && spd != 0))
     differntialDown(f_map[0], f_map[1]);
 
@@ -151,6 +157,7 @@ void algo(int a, int b, int spd) {
   Left(f_map[0]);
   Right(f_map[1]);
 }
+
 void Left(int t) {
   int x = map(t, -100, 100, 1, 127); // forward
 //  Serial.print("Left:");
