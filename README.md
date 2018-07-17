@@ -1,7 +1,7 @@
 # core
 Rover codes 
 
-# Setup instructions for pirate
+# Setup instructions
 
 1. After burning the [Raspbian Strech Lite](http://director.downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-03-14/2018-03-13-raspbian-stretch-lite.zip) on memory card and ```touch SSH``` in boot folder.
 
@@ -22,8 +22,8 @@ network={
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install git
-git clone https://github.com/vshelke/pirate.git
-cd pirate
+git clone https://github.com/teamrudra/core.git
+cd core
 ./install.sh
 ```
 ## Setting up GPSD daemon
@@ -44,7 +44,7 @@ Then run the ```sudo systemctl enable gpsd``` to start at every boot or ```sudo 
 gps2udp -j -u 192.168.1.29:23907 -b
 ```
 
-## Setting up static ethernet IP address on piRate
+## Setting up static ethernet IP address on pi
 
 Open the dhcpcd.conf by ```sudo nano /etc/dhcpcd.conf``` and add following to end of file :-
 
