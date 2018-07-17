@@ -1,4 +1,4 @@
-# pirate
+# core
 Rover codes 
 
 # Setup instructions for pirate
